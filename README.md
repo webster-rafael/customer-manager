@@ -14,7 +14,7 @@ API RESTful desenvolvida com Node.js, Fastify e TypeScript, responsável por ger
 - [x] O sistema deve permitir listar todos os clientes cadastrados.
 - [x] O sistema deve permitir cadastrar um novo cliente.
 - [x] O sistema deve permitir editar os dados de um cliente.
-- [ ] O sistema deve permitir excluir um cliente.
+- [x] O sistema deve permitir excluir um cliente.
 - [ ] O sistema deve permitir visualizar os dados de um cliente individual.
 
 ---
@@ -36,8 +36,8 @@ API RESTful desenvolvida com Node.js, Fastify e TypeScript, responsável por ger
   - [x] Repository TypeORM de clientes
 - [x] Cadastro de cliente
 - [x] Update de cliente
-- [ ] Delete de cliente
-- [ ] Listagem paginada ou com filtros
+- [x] Delete de cliente
+- [x] Listagem paginada ou com filtros
 - [ ] Integração com banco de dados real (atualmente mockado)
 - [ ] Deploy em produção
 

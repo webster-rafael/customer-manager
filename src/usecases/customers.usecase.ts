@@ -16,6 +16,7 @@ export class CustomersUseCase {
     email,
     phone,
     address,
+    active,
   }: CreateCustomers): Promise<Customer> {
     try {
       const data = await this.customerRepo.create({
@@ -23,6 +24,9 @@ export class CustomersUseCase {
         email,
         phone,
         address,
+        active,
+        created_at: new Date(),
+        updated_at: new Date(),
       });
       return data;
     } catch (error) {

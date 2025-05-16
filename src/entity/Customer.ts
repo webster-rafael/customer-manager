@@ -14,6 +14,9 @@ export class Customer {
   @Column()
   phone?: string;
 
+  @Column({ default: true })
+  active?: boolean;
+
   @Column({ type: "jsonb", nullable: true })
   address?: {
     street: string;
@@ -23,4 +26,10 @@ export class Customer {
     state: string;
     zip_code: string;
   };
+
+  @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+  created_at?: Date;
+
+  @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+  updated_at?: Date;
 }

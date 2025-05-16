@@ -8,6 +8,8 @@ describe("CustomersUseCase", () => {
   let useCase: CustomersUseCase;
   let mockCustomerRepo: jest.Mocked<CustomerRepository>;
 
+  const fixedDate = new Date("2024-01-01T00:00:00Z");
+
   const fakeCustomers = [
     {
       id: "1",
@@ -22,8 +24,19 @@ describe("CustomersUseCase", () => {
         state: "SP",
         zip_code: "00000-000",
       },
+      active: true,
+      created_at: fixedDate,
+      updated_at: new Date("2024-01-02T00:00:00Z"),
     },
   ];
+
+  beforeAll(() => {
+    jest.useFakeTimers().setSystemTime(fixedDate);
+  });
+
+  afterAll(() => {
+    jest.useRealTimers();
+  });
 
   beforeEach(() => {
     mockCustomerRepo = {
@@ -71,15 +84,26 @@ describe("CustomersUseCase", () => {
         state: "SP",
         zip_code: "11111-111",
       },
+      active: true,
     };
 
-    const createdCustomer = { id: "2", ...newCustomer };
+    const createdCustomer = {
+      id: "2",
+      ...newCustomer,
+      created_at: fixedDate,
+      updated_at: fixedDate,
+    };
+
     mockCustomerRepo.create.mockResolvedValue(createdCustomer as any);
 
     const result = await useCase.create(newCustomer);
 
     expect(result).toEqual(createdCustomer);
-    expect(mockCustomerRepo.create).toHaveBeenCalledWith(newCustomer);
+    expect(mockCustomerRepo.create).toHaveBeenCalledWith({
+      ...newCustomer,
+      created_at: fixedDate,
+      updated_at: fixedDate,
+    });
   });
 
   it("deve lançar erro ao tentar criar cliente", async () => {
@@ -95,6 +119,7 @@ describe("CustomersUseCase", () => {
         state: "SP",
         zip_code: "22222-222",
       },
+      active: true,
     };
 
     const error = new Error("DB insert error");
@@ -103,7 +128,11 @@ describe("CustomersUseCase", () => {
     await expect(useCase.create(newCustomer)).rejects.toThrow(
       "Error creating customer"
     );
-    expect(mockCustomerRepo.create).toHaveBeenCalledWith(newCustomer);
+    expect(mockCustomerRepo.create).toHaveBeenCalledWith({
+      ...newCustomer,
+      created_at: fixedDate,
+      updated_at: fixedDate,
+    });
     expect(console.log).toHaveBeenCalledWith(error);
   });
 
@@ -120,9 +149,16 @@ describe("CustomersUseCase", () => {
         state: "SP",
         zip_code: "33333-333",
       },
+      active: true,
     };
 
-    const updatedCustomer = { id: "1", ...updateData };
+    const updatedCustomer = {
+      id: "1",
+      ...updateData,
+      created_at: fixedDate,
+      updated_at: new Date("2024-01-04T00:00:00Z"),
+    };
+
     mockCustomerRepo.update.mockResolvedValue(updatedCustomer as any);
 
     const result = await useCase.update("1", updateData);
@@ -144,6 +180,7 @@ describe("CustomersUseCase", () => {
         state: "SP",
         zip_code: "00000-000",
       },
+      active: true,
     };
 
     const error = new Error("DB update error");
@@ -156,8 +193,6 @@ describe("CustomersUseCase", () => {
     expect(console.log).toHaveBeenCalledWith(error);
   });
 
-  // Testes para delete
-
   it("deve deletar cliente com sucesso", async () => {
     mockCustomerRepo.delete.mockResolvedValue();
 
@@ -169,7 +204,9 @@ describe("CustomersUseCase", () => {
     const error = new Error("DB delete error");
     mockCustomerRepo.delete.mockRejectedValue(error);
 
-    await expect(useCase.delete("1")).rejects.toThrow("Error deleting customer");
+    await expect(useCase.delete("1")).rejects.toThrow(
+      "Error deleting customer"
+    );
     expect(mockCustomerRepo.delete).toHaveBeenCalledWith("1");
     expect(console.log).toHaveBeenCalledWith(error);
   });

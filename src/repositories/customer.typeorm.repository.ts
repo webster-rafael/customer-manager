@@ -11,6 +11,9 @@ export class CustomerTypeOrmRepository implements CustomerRepository {
     email,
     phone,
     address,
+    active,
+    created_at,
+    updated_at,
   }: CreateCustomers): Promise<Customer> {
     try {
       const repo = AppDataSource.getRepository(Customer);
@@ -19,6 +22,9 @@ export class CustomerTypeOrmRepository implements CustomerRepository {
         email,
         phone,
         address,
+        active,
+        created_at,
+        updated_at,
       });
       await repo.save(customer);
       return customer;
@@ -45,10 +51,12 @@ export class CustomerTypeOrmRepository implements CustomerRepository {
       if (!customer) {
         throw new Error("Customer not found");
       }
-      customer.name = data.name;
-      customer.email = data.email;
-      customer.phone = data.phone;
-      customer.address = data.address;
+      customer.name = data.name ?? customer.name;
+      customer.email = data.email ?? customer.email;
+      customer.phone = data.phone ?? customer.phone;
+      customer.active = data.active ?? customer.active;
+      customer.address = data.address ?? customer.address;
+      customer.updated_at = new Date();
       await repo.save(customer);
       return customer;
     } catch (error) {

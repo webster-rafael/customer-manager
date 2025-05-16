@@ -1,3 +1,4 @@
+import "dotenv/config";
 import "reflect-metadata";
 import { DataSource } from "typeorm";
 
@@ -11,5 +12,5 @@ export default new DataSource({
   synchronize: false,
   logging: false,
   entities: ["src/entity/*.ts"],
-  migrations: ["dist/database/migrations/*.js"],
+  migrations: ["src/database/migrations/*.ts"],
 });

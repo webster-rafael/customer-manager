@@ -10,6 +10,17 @@ describe("CustomerTypeOrmRepository", () => {
   let mockFindOneBy: jest.Mock;
   let mockRemove: jest.Mock;
 
+  // Data fixa para mocks
+  const fixedDate = new Date("2024-01-01T00:00:00Z");
+
+  beforeAll(() => {
+    jest.useFakeTimers().setSystemTime(fixedDate);
+  });
+
+  afterAll(() => {
+    jest.useRealTimers();
+  });
+
   beforeEach(() => {
     repo = new CustomerTypeOrmRepository();
 
@@ -49,6 +60,9 @@ describe("CustomerTypeOrmRepository", () => {
           state: "Estado",
           zip_code: "12345-678",
         },
+        active: true,
+        created_at: fixedDate,
+        updated_at: fixedDate,
       },
     ];
 
@@ -87,6 +101,9 @@ describe("CustomerTypeOrmRepository", () => {
     const createdCustomer = {
       id: "uuid-2",
       ...newCustomerData,
+      active: true,
+      created_at: fixedDate,
+      updated_at: fixedDate,
     };
 
     mockCreate.mockReturnValue(createdCustomer);
@@ -112,6 +129,9 @@ describe("CustomerTypeOrmRepository", () => {
         state: "Estado",
         zip_code: "87654-321",
       },
+      created_at: fixedDate,
+      updated_at: fixedDate,
+      active: true,
     };
 
     mockCreate.mockReturnValue(newCustomerData);
@@ -136,6 +156,8 @@ describe("CustomerTypeOrmRepository", () => {
         state: "Estado",
         zip_code: "99999-999",
       },
+      // active pode ser omitido, se quiser testar atualização, adicione ativo aqui
+      active: true,
     };
 
     const existingCustomer = {
@@ -151,9 +173,16 @@ describe("CustomerTypeOrmRepository", () => {
         state: "Estado",
         zip_code: "12345-678",
       },
+      active: true,
+      created_at: fixedDate,
+      updated_at: fixedDate,
     };
 
-    const updatedCustomer = { ...existingCustomer, ...updateData };
+    const updatedCustomer = {
+      ...existingCustomer,
+      ...updateData,
+      updated_at: fixedDate, // por causa do jest fake timer
+    };
 
     mockFindOneBy.mockResolvedValue(existingCustomer);
     mockSave.mockResolvedValue(updatedCustomer);
@@ -206,6 +235,9 @@ describe("CustomerTypeOrmRepository", () => {
         state: "Estado W",
         zip_code: "00000-000",
       },
+      active: true,
+      created_at: fixedDate,
+      updated_at: fixedDate,
     };
 
     mockFindOneBy.mockResolvedValue(existingCustomer);
