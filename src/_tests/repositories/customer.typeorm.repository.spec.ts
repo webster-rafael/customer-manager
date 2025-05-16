@@ -7,6 +7,7 @@ describe("CustomerTypeOrmRepository", () => {
   let mockFind: jest.Mock;
   let mockSave: jest.Mock;
   let mockCreate: jest.Mock;
+  let mockFindOneBy: jest.Mock;
 
   beforeEach(() => {
     repo = new CustomerTypeOrmRepository();
@@ -14,11 +15,13 @@ describe("CustomerTypeOrmRepository", () => {
     mockFind = jest.fn();
     mockSave = jest.fn();
     mockCreate = jest.fn();
+    mockFindOneBy = jest.fn();
 
     jest.spyOn(AppDataSource, "getRepository").mockReturnValue({
       find: mockFind,
       create: mockCreate,
       save: mockSave,
+      findOneBy: mockFindOneBy,
     } as any);
 
     jest.spyOn(console, "log").mockImplementation(() => {});
@@ -114,5 +117,73 @@ describe("CustomerTypeOrmRepository", () => {
     await expect(repo.create(newCustomerData as any)).rejects.toThrow(
       "Error creating customer"
     );
+  });
+
+  it("deve atualizar um cliente com sucesso", async () => {
+    const id = "uuid-1";
+    const updateData = {
+      name: "João Atualizado",
+      email: "joao@atualizado.com",
+      phone: "111222333",
+      address: {
+        street: "Rua Atualizada",
+        number: "123",
+        neighborhood: "Centro",
+        city: "Cidade",
+        state: "Estado",
+        zip_code: "99999-999",
+      },
+    };
+
+    const existingCustomer = {
+      id,
+      name: "João",
+      email: "joao@exemplo.com",
+      phone: "123456789",
+      address: {
+        street: "Rua Antiga",
+        number: "100",
+        neighborhood: "Centro",
+        city: "Cidade",
+        state: "Estado",
+        zip_code: "12345-678",
+      },
+    };
+
+    const updatedCustomer = { ...existingCustomer, ...updateData };
+
+    mockFindOneBy.mockResolvedValue(existingCustomer);
+    mockSave.mockResolvedValue(updatedCustomer);
+
+    const result = await repo.update(id, updateData as any);
+
+    expect(mockFindOneBy).toHaveBeenCalledWith({ id });
+    expect(mockSave).toHaveBeenCalledWith(updatedCustomer);
+    expect(result).toEqual(updatedCustomer);
+  });
+
+  it("deve lançar erro se o cliente a ser atualizado não for encontrado", async () => {
+    const id = "uuid-invalido";
+    const updateData = {
+      name: "Nome Qualquer",
+      email: "email@qualquer.com",
+      phone: "000000000",
+      address: {
+        street: "Rua Qualquer",
+        number: "0",
+        neighborhood: "Bairro",
+        city: "Cidade",
+        state: "Estado",
+        zip_code: "00000-000",
+      },
+    };
+
+    mockFindOneBy.mockResolvedValue(null);
+
+    await expect(repo.update(id, updateData as any)).rejects.toThrow(
+      "Error updating customer"
+    );
+
+    expect(mockFindOneBy).toHaveBeenCalledWith({ id });
   });
 });

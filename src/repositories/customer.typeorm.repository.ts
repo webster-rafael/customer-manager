@@ -27,6 +27,7 @@ export class CustomerTypeOrmRepository implements CustomerRepository {
       throw new Error("Error creating customer");
     }
   }
+
   async findAll(): Promise<Customer[]> {
     try {
       const data = await AppDataSource.getRepository(Customer).find();
@@ -34,6 +35,25 @@ export class CustomerTypeOrmRepository implements CustomerRepository {
     } catch (error) {
       console.log(error);
       throw new Error("Error fetching customers");
+    }
+  }
+
+  async update(id: string, data: CreateCustomers): Promise<Customer> {
+    try {
+      const repo = AppDataSource.getRepository(Customer);
+      const customer = await repo.findOneBy({ id });
+      if (!customer) {
+        throw new Error("Customer not found");
+      }
+      customer.name = data.name;
+      customer.email = data.email;
+      customer.phone = data.phone;
+      customer.address = data.address;
+      await repo.save(customer);
+      return customer;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error updating customer");
     }
   }
 }

@@ -29,6 +29,7 @@ describe("CustomersUseCase", () => {
     mockCustomerRepo = {
       findAll: jest.fn(),
       create: jest.fn(),
+      update: jest.fn(), // Corrigido aqui (antes estava 'mockUpdate = jest.fn()')
     };
     useCase = new CustomersUseCase(mockCustomerRepo);
     jest.spyOn(console, "log").mockImplementation(() => {});
@@ -102,6 +103,57 @@ describe("CustomersUseCase", () => {
       "Error creating customer"
     );
     expect(mockCustomerRepo.create).toHaveBeenCalledWith(newCustomer);
+    expect(console.log).toHaveBeenCalledWith(error);
+  });
+
+  // Novos testes para update
+
+  it("deve atualizar cliente com sucesso", async () => {
+    const updateData: CreateCustomers = {
+      name: "Maria Updated",
+      email: "maria.updated@example.com",
+      phone: "999999999",
+      address: {
+        street: "Rua D",
+        number: "4",
+        neighborhood: "Novo Bairro",
+        city: "SP",
+        state: "SP",
+        zip_code: "33333-333",
+      },
+    };
+
+    const updatedCustomer = { id: "1", ...updateData };
+    mockCustomerRepo.update.mockResolvedValue(updatedCustomer as any);
+
+    const result = await useCase.update("1", updateData);
+
+    expect(result).toEqual(updatedCustomer);
+    expect(mockCustomerRepo.update).toHaveBeenCalledWith("1", updateData);
+  });
+
+  it("deve lançar erro ao tentar atualizar cliente", async () => {
+    const updateData: CreateCustomers = {
+      name: "Falha Update",
+      email: "fail.update@example.com",
+      phone: "000000000",
+      address: {
+        street: "Rua Fail",
+        number: "0",
+        neighborhood: "Erro Bairro",
+        city: "SP",
+        state: "SP",
+        zip_code: "00000-000",
+      },
+    };
+
+    const error = new Error("DB update error");
+    mockCustomerRepo.update.mockRejectedValue(error);
+
+    await expect(useCase.update("1", updateData)).rejects.toThrow(
+      "Error updating customer"
+    );
+    expect(mockCustomerRepo.update).toHaveBeenCalledWith("1", updateData);
     expect(console.log).toHaveBeenCalledWith(error);
   });
 });

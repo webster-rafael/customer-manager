@@ -40,4 +40,14 @@ export class CustomersUseCase {
       throw new Error("Error fetching customers");
     }
   }
+
+  async update(id: string, data: CreateCustomers): Promise<Customer> {
+    try {
+      const customer = await this.customerRepo.update(id, data);
+      return customer;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error updating customer");
+    }
+  }
 }

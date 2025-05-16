@@ -13,7 +13,7 @@ API RESTful desenvolvida com Node.js, Fastify e TypeScript, responsável por ger
 - [x] Cada requisição autenticada deve ser verificada por um middleware (`verifyJwt`).
 - [x] O sistema deve permitir listar todos os clientes cadastrados.
 - [x] O sistema deve permitir cadastrar um novo cliente.
-- [ ] O sistema deve permitir editar os dados de um cliente.
+- [x] O sistema deve permitir editar os dados de um cliente.
 - [ ] O sistema deve permitir excluir um cliente.
 - [ ] O sistema deve permitir visualizar os dados de um cliente individual.
 
@@ -35,7 +35,7 @@ API RESTful desenvolvida com Node.js, Fastify e TypeScript, responsável por ger
   - [x] UseCase de clientes
   - [x] Repository TypeORM de clientes
 - [x] Cadastro de cliente
-- [ ] Update de cliente
+- [x] Update de cliente
 - [ ] Delete de cliente
 - [ ] Listagem paginada ou com filtros
 - [ ] Integração com banco de dados real (atualmente mockado)
