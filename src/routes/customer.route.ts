@@ -2,6 +2,7 @@ import { FastifyInstance } from "fastify";
 import { verifyJwt } from "../middleware/auth.middleware";
 import {
   createCustomerController,
+  deleteCustomerController,
   listCustomersController,
   updateCustomerController,
 } from "../controllers/customers.controller";
@@ -15,4 +16,6 @@ export async function customerRoutes(app: FastifyInstance) {
   app.get("/", listCustomersController);
 
   app.put("/:id", updateCustomerController);
+
+  app.delete("/:id", deleteCustomerController);
 }

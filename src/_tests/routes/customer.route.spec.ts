@@ -4,7 +4,8 @@ import { customerRoutes } from "../../../src/routes/customer.route";
 import {
   createCustomerController,
   listCustomersController,
-  updateCustomerController, // Adicione aqui
+  updateCustomerController,
+  deleteCustomerController,
 } from "../../../src/controllers/customers.controller";
 import { CreateCustomers } from "../../interface/customer.interface";
 
@@ -31,6 +32,11 @@ jest.mock("../../../src/controllers/customers.controller", () => ({
       const { id } = request.params;
       const body = request.body;
       reply.code(200).send({ id, ...body });
+    }
+  ),
+  deleteCustomerController: jest.fn(
+    (request: FastifyRequest<{ Params: Params }>, reply: FastifyReply) => {
+      reply.code(204).send();
     }
   ),
 }));
@@ -79,11 +85,11 @@ describe("customerRoutes", () => {
         Authorization: `Bearer ${token}`,
       },
       payload: {
-        name: "Maria",
-        email: "maria@example.com",
+        name: "Fulano",
+        email: "fulano@example.com",
         phone: "123456789",
         address: {
-          street: "Rua das Flores",
+          street: "Rua sem Saída",
           number: "100",
           neighborhood: "Centro",
           city: "São Paulo",
@@ -95,10 +101,7 @@ describe("customerRoutes", () => {
 
     expect(response.statusCode).toBe(201);
     expect(response.json()).toEqual({ id: 2, name: "Maria" });
-    expect(
-      require("../../../src/controllers/customers.controller")
-        .createCustomerController
-    ).toHaveBeenCalled();
+    expect(createCustomerController).toHaveBeenCalled();
   });
 
   it("deve retornar 200 ao atualizar um cliente", async () => {
@@ -130,5 +133,20 @@ describe("customerRoutes", () => {
     expect(response.statusCode).toBe(200);
     expect(response.json()).toEqual({ id: "2", ...updatedPayload });
     expect(updateCustomerController).toHaveBeenCalled();
+  });
+
+  it("deve retornar 204 ao deletar um cliente", async () => {
+    const token = app.jwt.sign({ id: 1, email: "teste@teste.com" });
+
+    const response = await app.inject({
+      method: "DELETE",
+      url: "/customers/2",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    expect(response.statusCode).toBe(204);
+    expect(deleteCustomerController).toHaveBeenCalled();
   });
 });

@@ -8,6 +8,7 @@ describe("CustomerTypeOrmRepository", () => {
   let mockSave: jest.Mock;
   let mockCreate: jest.Mock;
   let mockFindOneBy: jest.Mock;
+  let mockRemove: jest.Mock;
 
   beforeEach(() => {
     repo = new CustomerTypeOrmRepository();
@@ -16,12 +17,14 @@ describe("CustomerTypeOrmRepository", () => {
     mockSave = jest.fn();
     mockCreate = jest.fn();
     mockFindOneBy = jest.fn();
+    mockRemove = jest.fn();
 
     jest.spyOn(AppDataSource, "getRepository").mockReturnValue({
       find: mockFind,
       create: mockCreate,
       save: mockSave,
       findOneBy: mockFindOneBy,
+      remove: mockRemove,
     } as any);
 
     jest.spyOn(console, "log").mockImplementation(() => {});
@@ -35,11 +38,11 @@ describe("CustomerTypeOrmRepository", () => {
     const fakeCustomers: Customer[] = [
       {
         id: "uuid-1",
-        name: "John Doe",
-        email: "john@example.com",
+        name: "Fulano",
+        email: "fulano@example.com",
         phone: "123456789",
         address: {
-          street: "Rua A",
+          street: "Rua Sem Saída",
           number: "100",
           neighborhood: "Centro",
           city: "Cidade",
@@ -183,6 +186,43 @@ describe("CustomerTypeOrmRepository", () => {
     await expect(repo.update(id, updateData as any)).rejects.toThrow(
       "Error updating customer"
     );
+
+    expect(mockFindOneBy).toHaveBeenCalledWith({ id });
+  });
+
+  it("deve deletar um cliente com sucesso", async () => {
+    const id = "uuid-1";
+
+    const existingCustomer = {
+      id,
+      name: "Cliente para deletar",
+      email: "cliente@delete.com",
+      phone: "123456789",
+      address: {
+        street: "Rua X",
+        number: "10",
+        neighborhood: "Bairro Y",
+        city: "Cidade Z",
+        state: "Estado W",
+        zip_code: "00000-000",
+      },
+    };
+
+    mockFindOneBy.mockResolvedValue(existingCustomer);
+    mockRemove.mockResolvedValue(undefined);
+
+    await expect(repo.delete(id)).resolves.toBeUndefined();
+
+    expect(mockFindOneBy).toHaveBeenCalledWith({ id });
+    expect(mockRemove).toHaveBeenCalledWith(existingCustomer);
+  });
+
+  it("deve lançar erro ao tentar deletar cliente inexistente", async () => {
+    const id = "uuid-invalido";
+
+    mockFindOneBy.mockResolvedValue(null);
+
+    await expect(repo.delete(id)).rejects.toThrow("Error deleting customer");
 
     expect(mockFindOneBy).toHaveBeenCalledWith({ id });
   });

@@ -4,34 +4,61 @@ import { CreateCustomers } from "../interface/customer.interface";
 
 export async function listCustomersController(
   request: FastifyRequest,
-  reply: FastifyReply
+  reply: FastifyReply,
+  useCase?: CustomersUseCase
 ) {
-  const customerUseCase = new CustomersUseCase();
-  const customers = await customerUseCase.findAll();
-  return reply.status(200).send(customers);
+  const uc = useCase ?? new CustomersUseCase();
+
+  try {
+    const customers = await uc.findAll();
+    return reply.code(200).send(customers);
+  } catch (error) {
+    return reply.code(500).send({ message: "Error fetching customers" });
+  }
 }
 
 export async function createCustomerController(
   request: FastifyRequest<{ Body: CreateCustomers }>,
-  reply: FastifyReply
+  reply: FastifyReply,
+  useCase?: CustomersUseCase
 ) {
-  const useCase = new CustomersUseCase();
-  const data = await useCase.create(request.body);
-  return reply.status(201).send(data);
+  const uc = useCase ?? new CustomersUseCase();
+
+  try {
+    const newCustomer = await uc.create(request.body);
+    return reply.code(201).send(newCustomer);
+  } catch (error) {
+    return reply.code(400).send({ message: (error as Error).message || "Error creating customer" });
+  }
 }
 
 export async function updateCustomerController(
   request: FastifyRequest<{ Params: { id: string }; Body: CreateCustomers }>,
-  reply: FastifyReply
+  reply: FastifyReply,
+  useCase?: CustomersUseCase
 ) {
-  const { id } = request.params;
-  const data = request.body;
+  const uc = useCase ?? new CustomersUseCase();
 
   try {
-    const useCase = new CustomersUseCase();
-    const updatedCustomer = await useCase.update(id, data);
-    reply.code(200).send(updatedCustomer);
+    const updatedCustomer = await uc.update(request.params.id, request.body);
+    return reply.code(200).send(updatedCustomer);
   } catch (error) {
-    reply.code(400).send({ message: (error as Error).message });
+    return reply.code(400).send({ message: (error as Error).message || "Error updating customer" });
+  }
+}
+
+export async function deleteCustomerController(
+  request: FastifyRequest<{ Params: { id: string } }>,
+  reply: FastifyReply,
+  useCase?: CustomersUseCase
+) {
+  const uc = useCase ?? new CustomersUseCase();
+
+  try {
+    await uc.delete(request.params.id);
+    return reply.code(204).send();
+  } catch (error) {
+    console.error(`Error deleting customer`, error);
+    return reply.code(400).send({ message: (error as Error).message || "Error deleting customer" });
   }
 }

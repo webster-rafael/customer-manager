@@ -20,4 +20,5 @@ export interface CustomerRepository {
   create(data: CreateCustomers): Promise<Customer>;
   findAll(): Promise<Customer[]>;
   update(id: string, data: CreateCustomers): Promise<Customer>;
+  delete(id: string): Promise<void>;
 }

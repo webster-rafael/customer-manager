@@ -11,13 +11,13 @@ describe("CustomersUseCase", () => {
   const fakeCustomers = [
     {
       id: "1",
-      name: "John Doe",
-      email: "john@example.com",
+      name: "Fulano de tal",
+      email: "fulano@example.com",
       phone: "123456789",
       address: {
-        street: "Rua A",
+        street: "Rua Sem Saída",
         number: "1",
-        neighborhood: "Centro",
+        neighborhood: "Bairro sem entrada",
         city: "SP",
         state: "SP",
         zip_code: "00000-000",
@@ -29,7 +29,8 @@ describe("CustomersUseCase", () => {
     mockCustomerRepo = {
       findAll: jest.fn(),
       create: jest.fn(),
-      update: jest.fn(), // Corrigido aqui (antes estava 'mockUpdate = jest.fn()')
+      update: jest.fn(),
+      delete: jest.fn(),
     };
     useCase = new CustomersUseCase(mockCustomerRepo);
     jest.spyOn(console, "log").mockImplementation(() => {});
@@ -59,13 +60,13 @@ describe("CustomersUseCase", () => {
 
   it("deve criar cliente com sucesso", async () => {
     const newCustomer: CreateCustomers = {
-      name: "Jane Doe",
-      email: "jane@example.com",
+      name: "Fulana de tal",
+      email: "fulana@example.com",
       phone: "987654321",
       address: {
-        street: "Rua B",
+        street: "Rua Sem Saída",
         number: "2",
-        neighborhood: "Bairro",
+        neighborhood: "Bairro Sem Entrada",
         city: "SP",
         state: "SP",
         zip_code: "11111-111",
@@ -105,8 +106,6 @@ describe("CustomersUseCase", () => {
     expect(mockCustomerRepo.create).toHaveBeenCalledWith(newCustomer);
     expect(console.log).toHaveBeenCalledWith(error);
   });
-
-  // Novos testes para update
 
   it("deve atualizar cliente com sucesso", async () => {
     const updateData: CreateCustomers = {
@@ -154,6 +153,24 @@ describe("CustomersUseCase", () => {
       "Error updating customer"
     );
     expect(mockCustomerRepo.update).toHaveBeenCalledWith("1", updateData);
+    expect(console.log).toHaveBeenCalledWith(error);
+  });
+
+  // Testes para delete
+
+  it("deve deletar cliente com sucesso", async () => {
+    mockCustomerRepo.delete.mockResolvedValue();
+
+    await expect(useCase.delete("1")).resolves.toBeUndefined();
+    expect(mockCustomerRepo.delete).toHaveBeenCalledWith("1");
+  });
+
+  it("deve lançar erro ao tentar deletar cliente", async () => {
+    const error = new Error("DB delete error");
+    mockCustomerRepo.delete.mockRejectedValue(error);
+
+    await expect(useCase.delete("1")).rejects.toThrow("Error deleting customer");
+    expect(mockCustomerRepo.delete).toHaveBeenCalledWith("1");
     expect(console.log).toHaveBeenCalledWith(error);
   });
 });

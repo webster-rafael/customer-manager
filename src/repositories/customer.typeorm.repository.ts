@@ -56,4 +56,18 @@ export class CustomerTypeOrmRepository implements CustomerRepository {
       throw new Error("Error updating customer");
     }
   }
+
+  async delete(id: string): Promise<void> {
+    try {
+      const repo = AppDataSource.getRepository(Customer);
+      const customer = await repo.findOneBy({ id });
+      if (!customer) {
+        throw new Error("Customer not found");
+      }
+      await repo.remove(customer);
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error deleting customer");
+    }
+  }
 }

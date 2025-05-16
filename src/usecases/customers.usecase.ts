@@ -50,4 +50,13 @@ export class CustomersUseCase {
       throw new Error("Error updating customer");
     }
   }
+
+  async delete(id: string): Promise<void> {
+    try {
+      await this.customerRepo.delete(id);
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error deleting customer");
+    }
+  }
 }
