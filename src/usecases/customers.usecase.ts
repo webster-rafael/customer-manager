@@ -1,7 +1,35 @@
-import { CustomerRepository } from "../interface/customer.interface";
+import { Customer } from "../entity/Customer";
+import {
+  CreateCustomers,
+  CustomerRepository,
+} from "../interface/customer.interface";
+import { CustomerTypeOrmRepository } from "../repositories/customer.typeorm.repository";
 
 export class CustomersUseCase {
-  constructor(private customerRepo: CustomerRepository) {}
+  private customerRepo: CustomerRepository;
+  constructor(customerRepo?: CustomerRepository) {
+    this.customerRepo = customerRepo ?? new CustomerTypeOrmRepository();
+  }
+
+  async create({
+    name,
+    email,
+    phone,
+    address,
+  }: CreateCustomers): Promise<Customer> {
+    try {
+      const data = await this.customerRepo.create({
+        name,
+        email,
+        phone,
+        address,
+      });
+      return data;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error creating customer");
+    }
+  }
 
   async findAll() {
     try {

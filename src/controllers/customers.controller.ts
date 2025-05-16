@@ -1,15 +1,21 @@
-// src/controllers/customer.controller.ts
 import { FastifyRequest, FastifyReply } from "fastify";
-import { CustomerTypeOrmRepository } from "../repositories/customer.typeorm.repository";
 import { CustomersUseCase } from "../usecases/customers.usecase";
+import { CreateCustomers } from "../interface/customer.interface";
 
 export async function listCustomersController(
   request: FastifyRequest,
   reply: FastifyReply
 ) {
-  const customerRepo = new CustomerTypeOrmRepository();
-  const useCase = new CustomersUseCase(customerRepo);
-
-  const customers = await useCase.findAll();
+  const customerUseCase = new CustomersUseCase();
+  const customers = await customerUseCase.findAll();
   return reply.status(200).send(customers);
+}
+
+export async function createCustomerController(
+  request: FastifyRequest<{ Body: CreateCustomers }>,
+  reply: FastifyReply
+) {
+  const useCase = new CustomersUseCase();
+  const data = await useCase.create(request.body);
+  return reply.status(201).send(data);
 }

@@ -12,7 +12,7 @@ API RESTful desenvolvida com Node.js, Fastify e TypeScript, responsável por ger
 - [x] O token JWT deve ser obrigatório para acessar rotas protegidas.
 - [x] Cada requisição autenticada deve ser verificada por um middleware (`verifyJwt`).
 - [x] O sistema deve permitir listar todos os clientes cadastrados.
-- [ ] O sistema deve permitir cadastrar um novo cliente.
+- [x] O sistema deve permitir cadastrar um novo cliente.
 - [ ] O sistema deve permitir editar os dados de um cliente.
 - [ ] O sistema deve permitir excluir um cliente.
 - [ ] O sistema deve permitir visualizar os dados de um cliente individual.
@@ -34,7 +34,7 @@ API RESTful desenvolvida com Node.js, Fastify e TypeScript, responsável por ger
   - [x] Service de autenticação
   - [x] UseCase de clientes
   - [x] Repository TypeORM de clientes
-- [ ] Cadastro de cliente
+- [x] Cadastro de cliente
 - [ ] Update de cliente
 - [ ] Delete de cliente
 - [ ] Listagem paginada ou com filtros
