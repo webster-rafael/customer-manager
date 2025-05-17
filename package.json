@@ -13,9 +13,8 @@
     "test": "jest",
     "migrate": "npx typeorm-ts-node-esm migration:create",
     "typeorm": "typeorm-ts-node-esm",
-    "migration:run": "ts-node ./node_modules/typeorm/cli.js -d ./src/database/data-source.ts migration:run"
+    "migration:run": "node ./node_modules/typeorm/cli.js -d dist/database/data-source.js migration:run"
   },
-
   "keywords": [],
   "author": "",
   "license": "ISC",
