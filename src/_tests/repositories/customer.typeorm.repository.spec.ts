@@ -75,7 +75,7 @@ describe("CustomerTypeOrmRepository", () => {
     expect(mockFind).toHaveBeenCalled();
   });
 
-  it("deve lançar erro quando find lança", async () => {
+  it("deve lançar erro quando findAll lança", async () => {
     mockFind.mockRejectedValue(new Error("DB error"));
 
     await expect(repo.findAll()).rejects.toThrow("Error fetching customers");
@@ -96,20 +96,20 @@ describe("CustomerTypeOrmRepository", () => {
         state: "Estado",
         zip_code: "87654-321",
       },
-    };
-
-    const createdCustomer = {
-      id: "uuid-2",
-      ...newCustomerData,
       active: true,
       created_at: fixedDate,
       updated_at: fixedDate,
     };
 
+    const createdCustomer = {
+      id: "uuid-2",
+      ...newCustomerData,
+    } as Customer;
+
     mockCreate.mockReturnValue(createdCustomer);
     mockSave.mockResolvedValue(createdCustomer);
 
-    const result = await repo.create(newCustomerData as any);
+    const result = await repo.create(newCustomerData);
 
     expect(mockCreate).toHaveBeenCalledWith(newCustomerData);
     expect(mockSave).toHaveBeenCalledWith(createdCustomer);
@@ -129,20 +129,21 @@ describe("CustomerTypeOrmRepository", () => {
         state: "Estado",
         zip_code: "87654-321",
       },
+      active: true,
       created_at: fixedDate,
       updated_at: fixedDate,
-      active: true,
     };
 
-    mockCreate.mockReturnValue(newCustomerData);
+    mockCreate.mockReturnValue(newCustomerData as any);
     mockSave.mockRejectedValue(new Error("DB save error"));
 
     await expect(repo.create(newCustomerData as any)).rejects.toThrow(
       "Error creating customer"
     );
+    expect(console.log).toHaveBeenCalled();
   });
 
-  it("deve atualizar um cliente com sucesso", async () => {
+  it("deve atualizar cliente com sucesso", async () => {
     const id = "uuid-1";
     const updateData = {
       name: "João Atualizado",
@@ -156,7 +157,6 @@ describe("CustomerTypeOrmRepository", () => {
         state: "Estado",
         zip_code: "99999-999",
       },
-      // active pode ser omitido, se quiser testar atualização, adicione ativo aqui
       active: true,
     };
 
@@ -176,13 +176,13 @@ describe("CustomerTypeOrmRepository", () => {
       active: true,
       created_at: fixedDate,
       updated_at: fixedDate,
-    };
+    } as Customer;
 
     const updatedCustomer = {
       ...existingCustomer,
       ...updateData,
-      updated_at: fixedDate, // por causa do jest fake timer
-    };
+      updated_at: fixedDate,
+    } as Customer;
 
     mockFindOneBy.mockResolvedValue(existingCustomer);
     mockSave.mockResolvedValue(updatedCustomer);
@@ -194,68 +194,54 @@ describe("CustomerTypeOrmRepository", () => {
     expect(result).toEqual(updatedCustomer);
   });
 
-  it("deve lançar erro se o cliente a ser atualizado não for encontrado", async () => {
-    const id = "uuid-invalido";
-    const updateData = {
-      name: "Nome Qualquer",
-      email: "email@qualquer.com",
-      phone: "000000000",
-      address: {
-        street: "Rua Qualquer",
-        number: "0",
-        neighborhood: "Bairro",
-        city: "Cidade",
-        state: "Estado",
-        zip_code: "00000-000",
-      },
-    };
-
+  it("deve lançar erro quando atualizar cliente não encontrado", async () => {
     mockFindOneBy.mockResolvedValue(null);
 
-    await expect(repo.update(id, updateData as any)).rejects.toThrow(
+    await expect(repo.update("invalid-id", {} as any)).rejects.toThrow(
       "Error updating customer"
     );
-
-    expect(mockFindOneBy).toHaveBeenCalledWith({ id });
+    expect(mockFindOneBy).toHaveBeenCalledWith({ id: "invalid-id" });
   });
 
-  it("deve deletar um cliente com sucesso", async () => {
-    const id = "uuid-1";
-
-    const existingCustomer = {
-      id,
-      name: "Cliente para deletar",
-      email: "cliente@delete.com",
-      phone: "123456789",
-      address: {
-        street: "Rua X",
-        number: "10",
-        neighborhood: "Bairro Y",
-        city: "Cidade Z",
-        state: "Estado W",
-        zip_code: "00000-000",
-      },
-      active: true,
-      created_at: fixedDate,
-      updated_at: fixedDate,
-    };
-
+  it("deve deletar cliente com sucesso", async () => {
+    const existingCustomer = { id: "uuid-1" } as Customer;
     mockFindOneBy.mockResolvedValue(existingCustomer);
     mockRemove.mockResolvedValue(undefined);
 
-    await expect(repo.delete(id)).resolves.toBeUndefined();
+    await expect(repo.delete("uuid-1")).resolves.toBeUndefined();
 
-    expect(mockFindOneBy).toHaveBeenCalledWith({ id });
+    expect(mockFindOneBy).toHaveBeenCalledWith({ id: "uuid-1" });
     expect(mockRemove).toHaveBeenCalledWith(existingCustomer);
   });
 
-  it("deve lançar erro ao tentar deletar cliente inexistente", async () => {
-    const id = "uuid-invalido";
-
+  it("deve lançar erro quando deletar cliente não encontrado", async () => {
     mockFindOneBy.mockResolvedValue(null);
 
-    await expect(repo.delete(id)).rejects.toThrow("Error deleting customer");
+    await expect(repo.delete("invalid-id")).rejects.toThrow(
+      "Error deleting customer"
+    );
+    expect(mockFindOneBy).toHaveBeenCalledWith({ id: "invalid-id" });
+  });
 
-    expect(mockFindOneBy).toHaveBeenCalledWith({ id });
+  it("deve retornar true se email existir", async () => {
+    mockFindOneBy.mockResolvedValue({} as Customer);
+    const exists = await repo.verifyIfEmailExists("test@example.com");
+    expect(exists).toBe(true);
+    expect(mockFindOneBy).toHaveBeenCalledWith({ email: "test@example.com" });
+  });
+
+  it("deve retornar false se email não existir", async () => {
+    mockFindOneBy.mockResolvedValue(null);
+    const exists = await repo.verifyIfEmailExists("test@example.com");
+    expect(exists).toBe(false);
+    expect(mockFindOneBy).toHaveBeenCalledWith({ email: "test@example.com" });
+  });
+
+  it("deve lançar erro se verificar email falhar", async () => {
+    mockFindOneBy.mockRejectedValue(new Error("DB error"));
+    await expect(repo.verifyIfEmailExists("test@example.com")).rejects.toThrow(
+      "Error verifying email"
+    );
+    expect(mockFindOneBy).toHaveBeenCalledWith({ email: "test@example.com" });
   });
 });

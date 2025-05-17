@@ -44,6 +44,7 @@ describe("CustomersUseCase", () => {
       create: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
+      verifyIfEmailExists: jest.fn(),
     };
     useCase = new CustomersUseCase(mockCustomerRepo);
     jest.spyOn(console, "log").mockImplementation(() => {});
@@ -94,16 +95,47 @@ describe("CustomersUseCase", () => {
       updated_at: fixedDate,
     };
 
+    mockCustomerRepo.verifyIfEmailExists.mockResolvedValue(false);
     mockCustomerRepo.create.mockResolvedValue(createdCustomer as any);
 
     const result = await useCase.create(newCustomer);
 
     expect(result).toEqual(createdCustomer);
+    expect(mockCustomerRepo.verifyIfEmailExists).toHaveBeenCalledWith(
+      "fulana@example.com"
+    );
     expect(mockCustomerRepo.create).toHaveBeenCalledWith({
       ...newCustomer,
       created_at: fixedDate,
       updated_at: fixedDate,
     });
+  });
+
+  it("deve lançar erro se o e-mail já estiver cadastrado", async () => {
+    const newCustomer: CreateCustomers = {
+      name: "Duplicado",
+      email: "duplicado@example.com",
+      phone: "999999999",
+      address: {
+        street: "Rua E",
+        number: "5",
+        neighborhood: "Duplicado Bairro",
+        city: "SP",
+        state: "SP",
+        zip_code: "44444-444",
+      },
+      active: true,
+    };
+
+    mockCustomerRepo.verifyIfEmailExists.mockResolvedValue(true);
+
+    await expect(useCase.create(newCustomer)).rejects.toThrow(
+      "Email já cadastrado"
+    );
+    expect(mockCustomerRepo.verifyIfEmailExists).toHaveBeenCalledWith(
+      "duplicado@example.com"
+    );
+    expect(mockCustomerRepo.create).not.toHaveBeenCalled();
   });
 
   it("deve lançar erro ao tentar criar cliente", async () => {
@@ -123,10 +155,14 @@ describe("CustomersUseCase", () => {
     };
 
     const error = new Error("DB insert error");
+    mockCustomerRepo.verifyIfEmailExists.mockResolvedValue(false);
     mockCustomerRepo.create.mockRejectedValue(error);
 
     await expect(useCase.create(newCustomer)).rejects.toThrow(
       "Error creating customer"
+    );
+    expect(mockCustomerRepo.verifyIfEmailExists).toHaveBeenCalledWith(
+      "erro@example.com"
     );
     expect(mockCustomerRepo.create).toHaveBeenCalledWith({
       ...newCustomer,

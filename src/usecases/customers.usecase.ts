@@ -19,7 +19,12 @@ export class CustomersUseCase {
     active,
   }: CreateCustomers): Promise<Customer> {
     try {
-      const data = await this.customerRepo.create({
+      const emailExists = await this.verifyIfEmailExists(email);
+      if (emailExists) {
+        throw new Error("Email já cadastrado");
+      }
+
+      return await this.customerRepo.create({
         name,
         email,
         phone,
@@ -28,8 +33,10 @@ export class CustomersUseCase {
         created_at: new Date(),
         updated_at: new Date(),
       });
-      return data;
     } catch (error) {
+      if (error instanceof Error && error.message === "Email já cadastrado") {
+        throw error;
+      }
       console.log(error);
       throw new Error("Error creating customer");
     }
@@ -61,6 +68,18 @@ export class CustomersUseCase {
     } catch (error) {
       console.log(error);
       throw new Error("Error deleting customer");
+    }
+  }
+
+  async verifyIfEmailExists(email: string): Promise<boolean> {
+    try {
+      const customer = await this.customerRepo.verifyIfEmailExists(email);
+      return customer;
+    } catch (error) {
+      console.log(error);
+      throw new Error(
+        (error as Error).message || "Error finding customer by email"
+      );
     }
   }
 }

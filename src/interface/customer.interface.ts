@@ -24,4 +24,5 @@ export interface CustomerRepository {
   findAll(): Promise<Customer[]>;
   update(id: string, data: CreateCustomers): Promise<Customer>;
   delete(id: string): Promise<void>;
+  verifyIfEmailExists(email: string): Promise<boolean>;
 }

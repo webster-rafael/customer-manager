@@ -78,4 +78,15 @@ export class CustomerTypeOrmRepository implements CustomerRepository {
       throw new Error("Error deleting customer");
     }
   }
+
+  async verifyIfEmailExists(email: string): Promise<boolean> {
+    try {
+      const repo = AppDataSource.getRepository(Customer);
+      const customer = await repo.findOneBy({ email });
+      return !!customer;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error verifying email");
+    }
+  }
 }
