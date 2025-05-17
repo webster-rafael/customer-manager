@@ -5,7 +5,7 @@ const PORT = process.env.PORT ? Number(process.env.PORT) : 3300;
 
 AppDataSource.initialize()
   .then(() => {
-    app.listen({ port: PORT }, () => {
+    app.listen({ port: PORT, host: "0.0.0.0" }, (err, address) => {
       console.log(`Server is running on http://localhost:${PORT} 🚀`);
     });
   })
