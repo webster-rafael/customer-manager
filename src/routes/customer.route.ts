@@ -1,11 +1,11 @@
 import { FastifyInstance } from "fastify";
-import { verifyJwt } from "../middleware/auth.middleware";
+import { verifyJwt } from "../middleware/auth.middleware.js";
 import {
   createCustomerController,
   deleteCustomerController,
   listCustomersController,
   updateCustomerController,
-} from "../controllers/customers.controller";
+} from "../controllers/customers.controller.js";
 import { CreateCustomers } from "../interface/customer.interface";
 
 export async function customerRoutes(app: FastifyInstance) {

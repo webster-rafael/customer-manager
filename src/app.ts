@@ -1,8 +1,8 @@
 import Fastify from "fastify";
 import fastifyJwt from "@fastify/jwt";
-import { authRoutes } from "./routes/auth.route";
-import { customerRoutes } from "./routes/customer.route";
-import { AuthController } from "./controllers/auth.controller";
+import { authRoutes } from "./routes/auth.route.js";
+import { customerRoutes } from "./routes/customer.route.js";
+import { AuthController } from "./controllers/auth.controller.js";
 import cors from "@fastify/cors";
 
 export const app = Fastify();

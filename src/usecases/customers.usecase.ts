@@ -1,9 +1,9 @@
-import { Customer } from "../entity/Customer";
+import { Customer } from "../entity/Customer.js";
 import {
   CreateCustomers,
   CustomerRepository,
 } from "../interface/customer.interface";
-import { CustomerTypeOrmRepository } from "../repositories/customer.typeorm.repository";
+import { CustomerTypeOrmRepository } from "../repositories/customer.typeorm.repository.js";
 
 export class CustomersUseCase {
   private customerRepo: CustomerRepository;

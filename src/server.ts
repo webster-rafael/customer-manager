@@ -1,6 +1,6 @@
 import "dotenv/config";
-import { app } from "./app";
-import AppDataSource from "./database/data-source";
+import { app } from "./app.js";
+import AppDataSource from "./database/data-source.js";
 
 AppDataSource.initialize()
   .then(() => {

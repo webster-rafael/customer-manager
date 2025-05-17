@@ -1,5 +1,5 @@
-import AppDataSource from "../database/data-source";
-import { Customer } from "../entity/Customer";
+import AppDataSource from "../database/data-source.js";
+import { Customer } from "../entity/Customer.js";
 import {
   CreateCustomers,
   CustomerRepository,

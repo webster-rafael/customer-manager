@@ -4,9 +4,16 @@ import { DataSource } from "typeorm";
 
 export default new DataSource({
   type: "postgres",
-  url: process.env.DATABASE_URL,
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 5432,
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   synchronize: false,
   logging: false,
-  entities: ["src/entity/*.ts"],
-  migrations: ["src/database/migrations/*.ts"],
+  entities: ["src/entity/*.js"],
+  migrations: ["src/database/migrations/*.js"],
+  ssl: {
+    rejectUnauthorized: false
+  }
 });

@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": "18"
+  },
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
@@ -12,10 +15,11 @@
     "typeorm": "typeorm-ts-node-esm",
     "migration:run": "ts-node ./node_modules/typeorm/cli.js -d ./src/database/data-source.ts migration:run"
   },
+
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "dependencies": {
     "@fastify/cors": "^11.0.1",
     "@fastify/jwt": "^9.1.0",

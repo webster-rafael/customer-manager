@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { CustomersUseCase } from "../usecases/customers.usecase";
+import { CustomersUseCase } from "../usecases/customers.usecase.js";
 import { CreateCustomers } from "../interface/customer.interface";
 
 export async function listCustomersController(
@@ -80,7 +80,8 @@ export async function verifyEmailExistsController(
     return reply.code(200).send({ exists: emailExists });
   } catch (error) {
     return reply.code(400).send({
-      message: error instanceof Error ? error.message : "Error creating customer",
+      message:
+        error instanceof Error ? error.message : "Error creating customer",
     });
   }
 }
