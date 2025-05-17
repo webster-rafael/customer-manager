@@ -45,6 +45,7 @@ describe("CustomersUseCase", () => {
       update: jest.fn(),
       delete: jest.fn(),
       verifyIfEmailExists: jest.fn(),
+      findByEmail: jest.fn(), // Novo método usado no update
     };
     useCase = new CustomersUseCase(mockCustomerRepo);
     jest.spyOn(console, "log").mockImplementation(() => {});
@@ -195,12 +196,51 @@ describe("CustomersUseCase", () => {
       updated_at: new Date("2024-01-04T00:00:00Z"),
     };
 
+    mockCustomerRepo.findByEmail.mockResolvedValue(null); // Atualização permitida
     mockCustomerRepo.update.mockResolvedValue(updatedCustomer as any);
 
     const result = await useCase.update("1", updateData);
 
     expect(result).toEqual(updatedCustomer);
-    expect(mockCustomerRepo.update).toHaveBeenCalledWith("1", updateData);
+    expect(mockCustomerRepo.findByEmail).toHaveBeenCalledWith(
+      "maria.updated@example.com"
+    );
+    expect(mockCustomerRepo.update).toHaveBeenCalledWith("1", {
+      ...updateData,
+      updated_at: expect.any(Date),
+    });
+  });
+
+  it("deve lançar erro se o e-mail já estiver cadastrado por outro cliente", async () => {
+    const updateData: CreateCustomers = {
+      name: "Outro Nome",
+      email: "duplicado@example.com",
+      phone: "111111111",
+      address: {
+        street: "Rua Teste",
+        number: "10",
+        neighborhood: "Bairro Teste",
+        city: "SP",
+        state: "SP",
+        zip_code: "12345-678",
+      },
+      active: true,
+    };
+
+    mockCustomerRepo.findByEmail.mockResolvedValue({
+      id: "2", // Cliente diferente
+      ...updateData,
+      created_at: fixedDate,
+      updated_at: fixedDate,
+    });
+
+    await expect(useCase.update("1", updateData)).rejects.toThrow(
+      "Email já cadastrado"
+    );
+    expect(mockCustomerRepo.findByEmail).toHaveBeenCalledWith(
+      "duplicado@example.com"
+    );
+    expect(mockCustomerRepo.update).not.toHaveBeenCalled();
   });
 
   it("deve lançar erro ao tentar atualizar cliente", async () => {
@@ -220,12 +260,19 @@ describe("CustomersUseCase", () => {
     };
 
     const error = new Error("DB update error");
+    mockCustomerRepo.findByEmail.mockResolvedValue(null);
     mockCustomerRepo.update.mockRejectedValue(error);
 
     await expect(useCase.update("1", updateData)).rejects.toThrow(
       "Error updating customer"
     );
-    expect(mockCustomerRepo.update).toHaveBeenCalledWith("1", updateData);
+    expect(mockCustomerRepo.findByEmail).toHaveBeenCalledWith(
+      "fail.update@example.com"
+    );
+    expect(mockCustomerRepo.update).toHaveBeenCalledWith("1", {
+      ...updateData,
+      updated_at: expect.any(Date),
+    });
     expect(console.log).toHaveBeenCalledWith(error);
   });
 

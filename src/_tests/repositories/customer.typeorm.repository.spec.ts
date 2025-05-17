@@ -10,7 +10,6 @@ describe("CustomerTypeOrmRepository", () => {
   let mockFindOneBy: jest.Mock;
   let mockRemove: jest.Mock;
 
-  // Data fixa para mocks
   const fixedDate = new Date("2024-01-01T00:00:00Z");
 
   beforeAll(() => {
@@ -243,5 +242,54 @@ describe("CustomerTypeOrmRepository", () => {
       "Error verifying email"
     );
     expect(mockFindOneBy).toHaveBeenCalledWith({ email: "test@example.com" });
+  });
+
+  it("deve retornar um cliente pelo email", async () => {
+    const email = "joao@example.com";
+    const fakeCustomer = {
+      id: "uuid-123",
+      name: "João",
+      email,
+      phone: "999888777",
+      address: {
+        street: "Rua XPTO",
+        number: "123",
+        neighborhood: "Bairro",
+        city: "Cidade",
+        state: "Estado",
+        zip_code: "00000-000",
+      },
+      active: true,
+      created_at: fixedDate,
+      updated_at: fixedDate,
+    } as Customer;
+
+    mockFindOneBy.mockResolvedValue(fakeCustomer);
+
+    const result = await repo.findByEmail(email);
+
+    expect(result).toEqual(fakeCustomer);
+    expect(mockFindOneBy).toHaveBeenCalledWith({ email });
+  });
+
+  it("deve retornar null se cliente com email não for encontrado", async () => {
+    mockFindOneBy.mockResolvedValue(null);
+
+    const result = await repo.findByEmail("naoexiste@example.com");
+
+    expect(result).toBeNull();
+    expect(mockFindOneBy).toHaveBeenCalledWith({
+      email: "naoexiste@example.com",
+    });
+  });
+
+  it("deve lançar erro se ocorrer falha ao buscar por email", async () => {
+    mockFindOneBy.mockRejectedValue(new Error("DB error"));
+
+    await expect(repo.findByEmail("erro@example.com")).rejects.toThrow(
+      "Error finding customer by email"
+    );
+
+    expect(mockFindOneBy).toHaveBeenCalledWith({ email: "erro@example.com" });
   });
 });

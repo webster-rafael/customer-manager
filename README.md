@@ -15,7 +15,6 @@ API RESTful desenvolvida com Node.js, Fastify e TypeScript, responsável por ger
 - [x] O sistema deve permitir cadastrar um novo cliente.
 - [x] O sistema deve permitir editar os dados de um cliente.
 - [x] O sistema deve permitir excluir um cliente.
-- [ ] O sistema deve permitir visualizar os dados de um cliente individual.
 
 ---
 

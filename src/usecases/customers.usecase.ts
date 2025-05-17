@@ -54,11 +54,23 @@ export class CustomersUseCase {
 
   async update(id: string, data: CreateCustomers): Promise<Customer> {
     try {
-      const customer = await this.customerRepo.update(id, data);
+      const customerWithEmail = await this.customerRepo.findByEmail(data.email);
+
+      if (customerWithEmail && customerWithEmail.id !== id) {
+        throw new Error("Email já cadastrado");
+      }
+
+      const customer = await this.customerRepo.update(id, {
+        ...data,
+        updated_at: new Date(),
+      });
+
       return customer;
     } catch (error) {
       console.log(error);
-      throw new Error("Error updating customer");
+      throw error instanceof Error && error.message === "Email já cadastrado"
+        ? error
+        : new Error("Error updating customer");
     }
   }
 

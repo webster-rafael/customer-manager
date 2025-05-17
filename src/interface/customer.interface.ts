@@ -22,6 +22,7 @@ export interface CreateCustomers {
 export interface CustomerRepository {
   create(data: CreateCustomers): Promise<Customer>;
   findAll(): Promise<Customer[]>;
+  findByEmail(email: string): Promise<Customer | null>;
   update(id: string, data: CreateCustomers): Promise<Customer>;
   delete(id: string): Promise<void>;
   verifyIfEmailExists(email: string): Promise<boolean>;

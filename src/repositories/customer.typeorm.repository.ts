@@ -44,6 +44,17 @@ export class CustomerTypeOrmRepository implements CustomerRepository {
     }
   }
 
+  async findByEmail(email: string): Promise<Customer | null> {
+    try {
+      const repo = AppDataSource.getRepository(Customer);
+      const customer = await repo.findOneBy({ email });
+      return customer ?? null;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error finding customer by email");
+    }
+  }
+
   async update(id: string, data: CreateCustomers): Promise<Customer> {
     try {
       const repo = AppDataSource.getRepository(Customer);
