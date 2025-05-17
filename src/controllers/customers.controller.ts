@@ -80,8 +80,7 @@ export async function verifyEmailExistsController(
     return reply.code(200).send({ exists: emailExists });
   } catch (error) {
     return reply.code(400).send({
-      message:
-        error instanceof Error ? error.message : "Error creating customer",
+      message: error instanceof Error ? error.message : "Error creating customer",
     });
   }
 }

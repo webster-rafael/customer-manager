@@ -1,4 +1,4 @@
-import {  FastifyPluginAsync } from "fastify";
+import { FastifyPluginAsync } from "fastify";
 import { AuthController } from "../controllers/auth.controller.js";
 
 interface AuthRoutesOptions {
