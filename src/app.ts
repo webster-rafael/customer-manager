@@ -16,6 +16,10 @@ app.register(fastifyJwt, {
   secret: "keysecret123",
 });
 
+app.get("/", async (request, reply) => {
+  return { hello: "world" };
+});
+
 app.register(authRoutes, {
   prefix: "/login",
   controller: authController,
